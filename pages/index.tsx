@@ -31,10 +31,7 @@ export default function Home() {
           style={{ opacity, scale, y }}
           className="absolute inset-0 flex flex-col items-center justify-center text-emerald-100 z-10"
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-3">Connor Crist</h1>
-          <p className="text-lg md:text-xl text-emerald-200 max-w-2xl">
-            Building intelligent, data-driven, and beautiful experiences.
-          </p>
+          
         </motion.div>
       </section>
 
