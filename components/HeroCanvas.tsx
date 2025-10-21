@@ -182,6 +182,7 @@ export default function HeroCanvas() {
         position: "absolute",
         inset: 0,
         zIndex: 0,
+        pointerEvents: "none",
       }}
       camera={{ position: [0, 0, 5], fov: 60 }}
     >

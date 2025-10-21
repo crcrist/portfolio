@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
     "@react-three/postprocessing": "^3.0.4",
@@ -15,6 +16,7 @@
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
     "framer-motion": "^12.23.24",
+    "google-auth-library": "^10.4.1",
     "next": "^15.1.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

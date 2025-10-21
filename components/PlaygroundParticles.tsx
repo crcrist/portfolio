@@ -52,6 +52,7 @@ export default function PlaygroundParticles() {
         position: "absolute",
         inset: 0,
         zIndex: 0,
+        pointerEvents: "none",
       }}
     />
   );
