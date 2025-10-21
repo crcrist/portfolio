@@ -1,6 +1,7 @@
 "use client";
 import Navbar from "../components/Navbar";
 import ProjectCard from "../components/ProjectCard";
+import Chatbot from "../components/Chatbot"
 import PlaygroundParticles from "../components/PlaygroundParticles";
 import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -64,6 +65,8 @@ export default function Home() {
           />
         </div>
       </section>
+
+      <Chatbot />
     </main>
   );
 }
