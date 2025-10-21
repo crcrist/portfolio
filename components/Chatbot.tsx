@@ -1,75 +1,112 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
+/**
+ * Chatbot component
+ * – floating bottom-right chat bubble
+ * – toggles open/close
+ * – sends POST to /api/chat
+ * – shows conversation history
+ */
 export default function Chatbot() {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<{ sender: "user" | "bot"; text: string }[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function sendMessage(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMsg = { role: "user", content: input };
-    setMessages((m) => [...m, userMsg]);
+    // optimistic user message
+    const newMessage = { sender: "user", text: input };
+    setMessages(prev => [...prev, newMessage]);
     setInput("");
-    setLoading(true);
+    setIsLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg.content }),
+        body: JSON.stringify({ message: newMessage.text }),
       });
-      const data = await res.json();
-      setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
-    } catch {
-      setMessages((m) => [
-        ...m,
-        { role: "assistant", content: "Sorry, something went wrong." },
+
+      const data = await response.json();
+      const botMessage = {
+        sender: "bot",
+        text: data.output || "Sorry, I wasn’t able to generate a response.",
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: `Error: ${err.message}` },
       ]);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 bg-emerald-900/80 text-white backdrop-blur-lg rounded-2xl shadow-lg border border-emerald-700 z-[9999]">
-      <div className="h-64 overflow-y-auto p-3 space-y-2">
-        {messages.map((m, i) => (
-          <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-            <div
-              className={`inline-block px-3 py-2 rounded-xl ${
-                m.role === "user"
-                  ? "bg-emerald-600/70"
-                  : "bg-emerald-800/70"
-              }`}
-            >
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <p className="text-sm text-emerald-300 italic">Connor’s Advocate is thinking…</p>
-        )}
-      </div>
+    <>
+      {/* Floating chat button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full w-14 h-14 shadow-lg flex items-center justify-center text-2xl z-[9999]"
+      >
+        💬
+      </button>
 
-      <form onSubmit={sendMessage} className="flex border-t border-emerald-700">
-        <input
-          type="text"
-          placeholder="Ask about Connor..."
-          className="flex-grow bg-transparent px-3 py-2 outline-none text-white placeholder-emerald-300"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="px-3 text-emerald-200 hover:text-emerald-100 transition"
-          disabled={loading}
-        >
-          ↩︎
-        </button>
-      </form>
-    </div>
+      {/* Chat window */}
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 w-80 bg-[#0e3b2f]/95 backdrop-blur-lg text-white border border-emerald-700 rounded-2xl shadow-2xl flex flex-col z-[9999]">
+          <div className="p-3 border-b border-emerald-700 font-semibold text-emerald-200">
+            Ask about Connor Crist
+          </div>
+
+          {/* Message area */}
+          <div className="flex-1 p-3 overflow-y-auto space-y-3 max-h-96">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`p-2 rounded-lg ${
+                  msg.sender === "user"
+                    ? "bg-emerald-700/80 self-end text-right"
+                    : "bg-emerald-900/70 text-left"
+                }`}
+              >
+                {msg.text}
+              </div>
+            ))}
+            {isLoading && (
+              <div className="text-sm text-emerald-300 animate-pulse">
+                Thinking…
+              </div>
+            )}
+          </div>
+
+          {/* Input form */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex border-t border-emerald-700"
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Ask a question..."
+              className="flex-1 p-2 bg-transparent outline-none text-white placeholder-emerald-400"
+            />
+            <button
+              type="submit"
+              className="px-3 text-emerald-300 hover:text-white"
+              disabled={isLoading}
+            >
+              ➤
+            </button>
+          </form>
+        </div>
+      )}
+    </>
   );
 }
