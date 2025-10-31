@@ -38,11 +38,11 @@ export default function Scene() {
       className="!bg-transparent"
     >
       <Suspense fallback={null}>
-        {/* Lighting */}
+        {/* Lighting - updated to crimson/ruby palette */}
         <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} color="#e17c6b" />
-        <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#d4615e" />
-        <pointLight position={[0, 0, 5]} intensity={1} color="#e17c6b" />
+        <directionalLight position={[10, 10, 5]} intensity={1} color="#c41e3a" />
+        <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#7a0c1a" />
+        <pointLight position={[0, 0, 5]} intensity={1} color="#a0141e" />
 
         {/* Environment for reflections */}
         <Environment preset="sunset" />

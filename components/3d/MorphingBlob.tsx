@@ -12,33 +12,49 @@ export default function MorphingBlob({ mousePosition }: MorphingBlobProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<any>(null);
 
-  // Create gradient colors for the blob (PRD colors)
+  // Create gradient colors for the blob (Crimson/Ruby palette)
   const colors = useMemo(() => ({
-    color1: new THREE.Color('#e17c6b'), // Primary rose coral
-    color2: new THREE.Color('#d4615e'), // Deeper coral
+    color1: new THREE.Color('#a0141e'), // Deep crimson red
+    color2: new THREE.Color('#7a0c1a'), // Dark blood red
+    emissive: new THREE.Color('#c41e3a'), // Vibrant crimson glow
   }), []);
 
-  // Animate the blob
+  // Animate the blob - lava lamp style organic morphing
   useFrame((state) => {
     if (!meshRef.current) return;
 
     const time = state.clock.elapsedTime;
 
-    // Gentle rotation
-    meshRef.current.rotation.x = time * 0.1;
-    meshRef.current.rotation.y = time * 0.15;
+    // Lava lamp style rotation (slower, more organic)
+    meshRef.current.rotation.x = Math.sin(time * 0.08) * 0.3 + time * 0.05;
+    meshRef.current.rotation.y = Math.cos(time * 0.12) * 0.3 + time * 0.08;
+    meshRef.current.rotation.z = Math.sin(time * 0.06) * 0.2;
 
-    // Mouse interaction - subtle parallax
-    meshRef.current.rotation.x += mousePosition.y * 0.05;
-    meshRef.current.rotation.y += mousePosition.x * 0.05;
+    // Complex morphing with multiple frequencies
+    const morph1 = Math.sin(time * 0.3) * 0.15;
+    const morph2 = Math.cos(time * 0.17) * 0.1;
+    const morph3 = Math.sin(time * 0.23) * 0.08;
+    const scale = 1 + morph1 + morph2 + morph3;
 
-    // Pulsing scale
-    const scale = 1 + Math.sin(time * 0.5) * 0.05;
-    meshRef.current.scale.set(scale, scale, scale);
+    // Non-uniform scaling for organic stretch/squish
+    meshRef.current.scale.set(
+      scale * (1 + Math.sin(time * 0.13) * 0.05),
+      scale * (1 + Math.cos(time * 0.19) * 0.05),
+      scale * (1 + Math.sin(time * 0.11) * 0.05)
+    );
 
-    // Animate material distortion
+    // Dynamic distortion (lava lamp viscosity)
     if (materialRef.current) {
-      materialRef.current.distort = 0.4 + Math.sin(time * 0.3) * 0.1;
+      const baseDistortion = 0.5;
+      const wave1 = Math.sin(time * 0.3) * 0.2;
+      const wave2 = Math.cos(time * 0.17) * 0.15;
+      materialRef.current.distort = baseDistortion + wave1 + wave2;
+    }
+
+    // Mouse interaction with smoothing
+    if (mousePosition.x !== 0 || mousePosition.y !== 0) {
+      meshRef.current.rotation.x += mousePosition.y * 0.03;
+      meshRef.current.rotation.y += mousePosition.x * 0.03;
     }
   });
 
@@ -47,18 +63,18 @@ export default function MorphingBlob({ mousePosition }: MorphingBlobProps) {
       {/* Icosahedron for smooth organic shape */}
       <icosahedronGeometry args={[2.5, 64]} />
 
-      {/* Distortion material with gradient effect */}
+      {/* Distortion material with gradient effect - enhanced for lava lamp */}
       <MeshDistortMaterial
         ref={materialRef}
         color={colors.color1}
-        emissive={colors.color2}
-        emissiveIntensity={0.3}
-        distort={0.4}
-        speed={2}
-        roughness={0.2}
-        metalness={0.8}
+        emissive={colors.emissive}
+        emissiveIntensity={0.4}
+        distort={0.5}
+        speed={1.5}
+        roughness={0.15}
+        metalness={0.85}
         transparent
-        opacity={0.9}
+        opacity={0.85}
       />
     </mesh>
   );

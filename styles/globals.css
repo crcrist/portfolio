@@ -164,6 +164,41 @@
   }
 }
 
+/* Lava lamp animation performance optimization */
+.animate-lava-lamp-1,
+.animate-lava-lamp-2,
+.animate-lava-lamp-3,
+.animate-lava-lamp-4 {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Accessibility - Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable lava lamp animations */
+  .animate-lava-lamp-1,
+  .animate-lava-lamp-2,
+  .animate-lava-lamp-3,
+  .animate-lava-lamp-4 {
+    animation: none !important;
+    opacity: 0.7 !important;
+    transform: none !important;
+  }
+
+  /* Simpler 3D scene for motion sensitivity */
+  canvas {
+    opacity: 0.5 !important;
+  }
+
+  /* All animations reduced or disabled */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Smooth page transitions */
 @media (prefers-reduced-motion: no-preference) {
   html {
