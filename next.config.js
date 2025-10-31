@@ -9,7 +9,7 @@ const nextConfig = {
   swcMinify: true,
 
   // Use standalone mode for smaller Docker images
-  output: 'standalone',
+  // output: 'standalone',  // Disabled for Cloud Run compatibility
 
   // Security headers
   headers: async () => [
