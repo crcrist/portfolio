@@ -27,9 +27,15 @@ RUN apk add --no-cache dumb-init
 # No npm install needed in production stage
 
 # Copy built application from builder (standalone mode)
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# Standalone includes node_modules and server.js
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+
+# Copy static assets
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+
+# Create non-root user for security
+USER node
 
 # Set environment to production and configure Next.js to listen on port 8080
 ENV NODE_ENV=production
