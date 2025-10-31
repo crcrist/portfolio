@@ -24,6 +24,30 @@ npm run build
 npm start
 ```
 
+## Deployment
+
+### Production URL
+https://portfolio-528730556404.us-central1.run.app
+
+### Deploying to Cloud Run
+```bash
+gcloud builds submit --config cloudbuild.yaml --project optical-name-470223-i3
+```
+
+This will:
+1. Build the Docker container
+2. Push to Google Container Registry
+3. Deploy to Cloud Run in us-central1
+4. Configure environment variables and service settings
+
+### Deployment Configuration
+- **Project ID**: optical-name-470223-i3
+- **Region**: us-central1
+- **Service**: portfolio
+- **Memory**: 2Gi
+- **CPU**: 1
+- **Max Instances**: 10
+
 ## Architecture
 
 ### Technology Stack

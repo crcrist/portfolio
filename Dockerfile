@@ -33,6 +33,14 @@ RUN npm ci --only=production
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
+# Copy data directory with embeddings for RAG
+COPY --from=builder /app/data ./data
+
+# Copy configuration files needed at runtime
+COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/postcss.config.js ./postcss.config.js
+COPY --from=builder /app/tailwind.config.js ./tailwind.config.js
+
 # Set environment to production and configure Next.js to listen on port 8080
 ENV NODE_ENV=production
 ENV PORT=8080
@@ -44,7 +52,7 @@ EXPOSE 8080
 # Cloud Run manages health checks via service configuration
 
 # Use dumb-init to handle signals properly
-ENTRYPOINT ["/sbin/dumb-init", "--"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 # Start the Next.js server
 CMD ["npm", "start"]
