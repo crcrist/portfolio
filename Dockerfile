@@ -40,9 +40,8 @@ ENV PORT=8080
 # Expose port (Cloud Run uses 8080 by default)
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+# Health check - Removed in favor of Cloud Run's startup probe configuration
+# Cloud Run manages health checks via service configuration
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/sbin/dumb-init", "--"]
