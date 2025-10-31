@@ -1,102 +1,155 @@
+"use client";
+import { useAchievements } from "./arcade/AchievementSystem";
+
 type ProjectCardProps = {
   title: string;
+  subtitle: string;
   description: string;
-  link: string;
-  screenColor: "green" | "amber";
+  difficulty: string;
+  players: string;
+  genre: string;
 };
 
-export default function ProjectCard({ title, description, link, screenColor }: ProjectCardProps) {
-  const glowColor = screenColor === 'green' 
-    ? 'rgba(52, 211, 153, 0.8)' 
-    : 'rgba(251, 191, 36, 0.8)';
+export default function ProjectCard({ title, subtitle, description, difficulty, players, genre }: ProjectCardProps) {
+  const { manager } = useAchievements();
+
+  const handleHover = () => {
+    manager.trackProjectView(title.toLowerCase().replace(/\s+/g, "-"));
+  };
 
   return (
-    <div className={`group relative rounded-xl border-2 p-6 transition-all duration-300
-                    hover:scale-[1.02] cursor-pointer
-                    ${screenColor === 'green'
-                      ? 'bg-emerald-950/30 border-emerald-500/30 hover:border-emerald-500 hover:bg-emerald-950/50'
-                      : 'bg-amber-950/30 border-amber-500/30 hover:border-amber-500 hover:bg-amber-950/50'}`}
+    <div onMouseEnter={handleHover}
+         className="group relative bg-black rounded-xl border-4 border-cyan-500 overflow-hidden
+                    transform hover:scale-105 hover:border-fuchsia-500 transition-all duration-300 cursor-pointer"
          style={{
-           boxShadow: `0 0 20px ${glowColor.replace('0.8', '0.2')}`
+           boxShadow: '0 0 30px rgba(34, 211, 238, 0.6)'
          }}>
       
       {/* Scanlines */}
-      <div className="absolute inset-0 pointer-events-none opacity-5 rounded-xl"
+      <div className="absolute inset-0 pointer-events-none opacity-20"
            style={{
-             backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, white 2px, white 4px)',
+             backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, cyan 2px, cyan 4px)',
            }} />
 
-      <div className="relative z-10">
-        {/* Title with status indicator */}
-        <div className="flex items-start justify-between mb-4">
-          <h3 className={`text-xl font-bold font-mono flex-1
-                         ${screenColor === 'green' ? 'text-emerald-400' : 'text-amber-400'}`}
-              style={{
-                textShadow: `0 0 10px ${glowColor}`
-              }}>
-            &gt; {title}
-          </h3>
-          
-          {/* Running indicator */}
-          <div className={`flex items-center gap-2 px-3 py-1 rounded border
-                          ${screenColor === 'green'
-                            ? 'bg-emerald-950/50 border-emerald-500/50'
-                            : 'bg-amber-950/50 border-amber-500/50'}`}>
-            <div className={`w-2 h-2 rounded-full animate-pulse
-                            ${screenColor === 'green' ? 'bg-emerald-400' : 'bg-amber-400'}`}
-                 style={{
-                   boxShadow: `0 0 8px ${glowColor}`
-                 }} />
-            <span className={`text-xs font-mono
-                             ${screenColor === 'green' ? 'text-emerald-400' : 'text-amber-400'}`}
-                  style={{
-                    textShadow: `0 0 5px ${glowColor}`
-                  }}>
-              RUN
-            </span>
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-600/20 via-transparent to-cyan-600/20 
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+      <div className="relative z-10 p-8">
+        {/* Game Title Banner */}
+        <div className="bg-gradient-to-r from-yellow-400 via-red-500 to-fuchsia-500 p-1 rounded-lg mb-6"
+             style={{
+               boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
+             }}>
+          <div className="bg-black p-4 rounded-lg">
+            <h3 className="text-3xl font-black text-center mb-2"
+                style={{
+                  fontFamily: 'Impact, sans-serif',
+                  background: 'linear-gradient(180deg, #ffff00 0%, #ff00ff 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 0 20px rgba(255, 255, 0, 0.6)'
+                }}>
+              {title}
+            </h3>
+            <p className="text-center text-cyan-400 font-bold text-sm"
+               style={{
+                 fontFamily: 'monospace',
+                 textShadow: '0 0 10px rgba(34, 211, 238, 0.8)'
+               }}>
+              {subtitle}
+            </p>
           </div>
         </div>
 
         {/* Description */}
-        <p className={`font-mono text-sm leading-relaxed mb-6
-                      ${screenColor === 'green' ? 'text-emerald-400/70' : 'text-amber-400/70'}`}>
+        <p className="text-white leading-relaxed mb-6 text-sm"
+           style={{ fontFamily: 'monospace' }}>
           {description}
         </p>
 
-        {/* Action link */}
-        <a 
-          href={link} 
-          className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 
-                     font-mono font-bold text-sm transition-all duration-200
-                     group-hover:translate-x-1
-                     ${screenColor === 'green'
-                       ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500 hover:text-black'
-                       : 'border-amber-500 text-amber-400 hover:bg-amber-500 hover:text-black'}`}
-          style={{
-            boxShadow: `0 0 15px ${glowColor.replace('0.8', '0.3')}`,
-            textShadow: `0 0 10px ${glowColor}`
-          }}
-        >
-          [EXECUTE]
-          <span className="group-hover:translate-x-1 transition-transform">&gt;</span>
-        </a>
+        {/* Game Info */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="bg-purple-950/50 border-2 border-fuchsia-500 rounded-lg p-3 text-center"
+               style={{
+                 boxShadow: '0 0 15px rgba(217, 70, 239, 0.4)'
+               }}>
+            <div className="text-xs text-fuchsia-400 font-bold mb-1"
+                 style={{ fontFamily: 'monospace' }}>
+              DIFFICULTY
+            </div>
+            <div className="text-yellow-400 font-black"
+                 style={{
+                   fontFamily: 'Impact, sans-serif',
+                   textShadow: '0 0 10px rgba(251, 191, 36, 0.8)'
+                 }}>
+              {difficulty}
+            </div>
+          </div>
 
-        {/* File info footer */}
-        <div className={`mt-6 pt-4 border-t flex items-center justify-between text-xs font-mono
-                        ${screenColor === 'green'
-                          ? 'border-emerald-500/20 text-emerald-400/50'
-                          : 'border-amber-500/20 text-amber-400/50'}`}>
-          <span>TYPE: APPLICATION</span>
-          <span>SIZE: 2.4MB</span>
-          <span>STATUS: ACTIVE</span>
+          <div className="bg-purple-950/50 border-2 border-cyan-500 rounded-lg p-3 text-center"
+               style={{
+                 boxShadow: '0 0 15px rgba(34, 211, 238, 0.4)'
+               }}>
+            <div className="text-xs text-cyan-400 font-bold mb-1"
+                 style={{ fontFamily: 'monospace' }}>
+              PLAYERS
+            </div>
+            <div className="text-white font-black"
+                 style={{
+                   fontFamily: 'Impact, sans-serif',
+                   textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+                 }}>
+              {players}
+            </div>
+          </div>
+
+          <div className="bg-purple-950/50 border-2 border-yellow-400 rounded-lg p-3 text-center"
+               style={{
+                 boxShadow: '0 0 15px rgba(251, 191, 36, 0.4)'
+               }}>
+            <div className="text-xs text-yellow-400 font-bold mb-1"
+                 style={{ fontFamily: 'monospace' }}>
+              GENRE
+            </div>
+            <div className="text-white font-black text-xs"
+                 style={{
+                   fontFamily: 'Impact, sans-serif',
+                   textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+                 }}>
+              {genre}
+            </div>
+          </div>
+        </div>
+
+        {/* Action button */}
+        <button className="w-full bg-gradient-to-r from-yellow-400 via-red-500 to-fuchsia-500 
+                          text-black font-black text-xl py-4 rounded-lg border-4 border-yellow-300
+                          hover:scale-105 active:scale-95 transition-transform"
+                style={{
+                  fontFamily: 'Impact, sans-serif',
+                  boxShadow: '0 0 25px rgba(251, 191, 36, 0.8)'
+                }}>
+          [START GAME]
+        </button>
+
+        {/* Flashing "INSERT COIN" indicator */}
+        <div className="text-center mt-4">
+          <span className="text-yellow-400 text-sm font-bold animate-pulse"
+                style={{
+                  fontFamily: 'monospace',
+                  textShadow: '0 0 10px rgba(251, 191, 36, 0.8)'
+                }}>
+            ▶ PRESS TO PLAY ◀
+          </span>
         </div>
       </div>
 
-      {/* Hover glow effect */}
-      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-           style={{
-             boxShadow: `inset 0 0 30px ${glowColor.replace('0.8', '0.2')}, 0 0 40px ${glowColor.replace('0.8', '0.2')}`
-           }} />
+      {/* Corner decorations */}
+      <div className="absolute top-2 left-2 w-4 h-4 border-t-4 border-l-4 border-yellow-400" />
+      <div className="absolute top-2 right-2 w-4 h-4 border-t-4 border-r-4 border-yellow-400" />
+      <div className="absolute bottom-2 left-2 w-4 h-4 border-b-4 border-l-4 border-yellow-400" />
+      <div className="absolute bottom-2 right-2 w-4 h-4 border-b-4 border-r-4 border-yellow-400" />
     </div>
   );
 }

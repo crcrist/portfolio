@@ -3,11 +3,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type NavbarProps = {
-  screenColor: "green" | "amber";
-  setScreenColor: (color: "green" | "amber") => void;
+  credits: number;
 };
 
-export default function Navbar({ screenColor, setScreenColor }: NavbarProps) {
+export default function Navbar({ credits }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
 
@@ -31,19 +30,15 @@ export default function Navbar({ screenColor, setScreenColor }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const glowColor = screenColor === 'green' 
-    ? 'rgba(52, 211, 153, 0.8)' 
-    : 'rgba(251, 191, 36, 0.8)';
-
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? `${screenColor === 'green' ? 'bg-emerald-950/90' : 'bg-amber-950/90'} backdrop-blur-sm border-b-2 ${screenColor === 'green' ? 'border-emerald-500/50' : 'border-amber-500/50'}`
+          ? "bg-black/90 backdrop-blur-sm border-b-4 border-cyan-500 shadow-xl"
           : "bg-transparent"
       }`}
       style={scrolled ? {
-        boxShadow: `0 4px 20px ${glowColor}`
+        boxShadow: '0 4px 30px rgba(34, 211, 238, 0.6)'
       } : {}}
     >
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -51,65 +46,68 @@ export default function Navbar({ screenColor, setScreenColor }: NavbarProps) {
           {/* Logo */}
           <Link 
             href="/" 
-            className={`flex items-center gap-3 group font-mono font-bold text-xl
-                       ${screenColor === 'green' ? 'text-emerald-400' : 'text-amber-400'}`}
-            style={{
-              textShadow: `0 0 10px ${glowColor}`
-            }}
+            className="flex items-center gap-3 group"
           >
-            <div className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center
-                           transition-all duration-300
-                           ${screenColor === 'green'
-                             ? 'bg-emerald-950 border-emerald-500'
-                             : 'bg-amber-950 border-amber-500'}`}
+            <div className="w-12 h-12 bg-gradient-to-br from-fuchsia-600 to-cyan-600 rounded-lg 
+                            flex items-center justify-center font-black text-2xl border-4 border-yellow-400
+                            transform group-hover:scale-110 transition-transform"
                  style={{
-                   boxShadow: `0 0 15px ${glowColor}`
+                   fontFamily: 'Impact, sans-serif',
+                   boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
                  }}>
               CC
             </div>
-            <span className="hidden md:inline">CONNOR.SYS</span>
+            <span className="text-2xl font-black text-yellow-400 hidden md:inline"
+                  style={{
+                    fontFamily: 'Impact, sans-serif',
+                    textShadow: '0 0 15px rgba(251, 191, 36, 0.8)'
+                  }}>
+              PORTFOLIO ARCADE
+            </span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Navigation */}
           <div className="flex items-center gap-4">
             {["projects", "about", "contact"].map((id) => (
               <a
                 key={id}
                 href={`#${id}`}
                 className={`capitalize transition-all duration-200 px-4 py-2 rounded-lg 
-                           font-mono font-bold text-sm border-2
+                           font-black text-sm border-4 transform hover:scale-105
                            ${activeSection === id
-                  ? `${screenColor === 'green'
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                      : 'bg-amber-500/20 border-amber-500 text-amber-400'}`
-                  : `${screenColor === 'green'
-                      ? 'border-emerald-500/30 text-emerald-400/70 hover:bg-emerald-500/10 hover:border-emerald-500'
-                      : 'border-amber-500/30 text-amber-400/70 hover:bg-amber-500/10 hover:border-amber-500'}`
+                  ? "bg-gradient-to-r from-fuchsia-600 to-cyan-600 border-yellow-400 text-white"
+                  : "bg-black border-cyan-500 text-cyan-400 hover:border-fuchsia-500"
                 }`}
                 style={{
-                  textShadow: activeSection === id ? `0 0 10px ${glowColor}` : 'none',
-                  boxShadow: activeSection === id ? `0 0 15px ${glowColor}` : 'none'
+                  fontFamily: 'Impact, sans-serif',
+                  textShadow: activeSection === id ? '0 0 10px rgba(255, 255, 255, 0.8)' : '0 0 10px rgba(34, 211, 238, 0.6)',
+                  boxShadow: activeSection === id ? '0 0 20px rgba(251, 191, 36, 0.6)' : 'none'
                 }}
               >
                 {id}
               </a>
             ))}
 
-            {/* Color Toggle Switch */}
-            <button
-              onClick={() => setScreenColor(screenColor === 'green' ? 'amber' : 'green')}
-              className={`relative px-4 py-2 rounded-lg border-2 font-mono font-bold text-xs
-                         transition-all duration-300 hover:scale-105
-                         ${screenColor === 'green'
-                           ? 'bg-emerald-950 border-emerald-500 text-emerald-400'
-                           : 'bg-amber-950 border-amber-500 text-amber-400'}`}
-              style={{
-                boxShadow: `0 0 15px ${glowColor}`,
-                textShadow: `0 0 10px ${glowColor}`
-              }}
-              title="Toggle screen color">
-              {screenColor === 'green' ? 'GREEN' : 'AMBER'}
-            </button>
+            {/* Credits display */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-black border-4 border-yellow-400 rounded-lg"
+                 style={{
+                   boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
+                 }}>
+              <div className="text-yellow-400 font-black text-sm"
+                   style={{
+                     fontFamily: 'Impact, sans-serif',
+                     textShadow: '0 0 10px rgba(251, 191, 36, 0.8)'
+                   }}>
+                CREDITS:
+              </div>
+              <div className="text-white font-black text-xl"
+                   style={{
+                     fontFamily: 'Impact, sans-serif',
+                     textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+                   }}>
+                {credits}
+              </div>
+            </div>
           </div>
         </div>
       </div>

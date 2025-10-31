@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white antialiased;
+    @apply bg-gradient-to-b from-purple-950 via-indigo-950 to-black text-white antialiased;
   }
 
   html {
@@ -13,56 +13,23 @@
 }
 
 @layer utilities {
-  /* CRT Screen effects */
-  .crt-screen {
-    position: relative;
-    background: #000;
+  /* Arcade neon glow effects */
+  .neon-cyan {
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8),
+                 0 0 20px rgba(34, 211, 238, 0.6),
+                 0 0 30px rgba(34, 211, 238, 0.4);
   }
 
-  .crt-screen::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.15) 1px,
-      transparent 1px,
-      transparent 2px
-    );
-    pointer-events: none;
+  .neon-fuchsia {
+    text-shadow: 0 0 10px rgba(217, 70, 239, 0.8),
+                 0 0 20px rgba(217, 70, 239, 0.6),
+                 0 0 30px rgba(217, 70, 239, 0.4);
   }
 
-  /* Phosphor glow effects */
-  .phosphor-green {
-    color: #4ade80;
-    text-shadow: 0 0 5px rgba(52, 211, 153, 0.8),
-                 0 0 10px rgba(52, 211, 153, 0.6),
-                 0 0 15px rgba(52, 211, 153, 0.4);
-  }
-
-  .phosphor-amber {
-    color: #fbbf24;
-    text-shadow: 0 0 5px rgba(251, 191, 36, 0.8),
-                 0 0 10px rgba(251, 191, 36, 0.6),
-                 0 0 15px rgba(251, 191, 36, 0.4);
-  }
-
-  /* Screen flicker animation */
-  .screen-flicker {
-    animation: flicker 0.15s infinite;
-  }
-
-  @keyframes flicker {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.95;
-    }
+  .neon-yellow {
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.8),
+                 0 0 20px rgba(251, 191, 36, 0.6),
+                 0 0 30px rgba(251, 191, 36, 0.4);
   }
 
   /* Scanline effect */
@@ -89,111 +56,111 @@
     z-index: 1;
   }
 
-  /* CRT curve effect */
-  .crt-curve {
-    border-radius: 8px;
-    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+  /* CRT screen effects */
+  .crt-screen {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    box-shadow: inset 0 0 60px rgba(34, 211, 238, 0.3);
   }
 
-  /* Terminal cursor blink */
-  @keyframes blink {
-    0%, 49% {
-      opacity: 1;
-    }
-    50%, 100% {
-      opacity: 0;
-    }
+  .crt-screen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+    border-radius: 12px;
   }
 
-  .cursor-blink {
-    animation: blink 1s step-end infinite;
+  /* Pixel art rendering */
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
   }
 
-  /* Custom scrollbar - retro style */
+  /* Custom scrollbar - arcade style */
   .scrollbar-thin::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(52, 211, 153, 0.5);
+    background: linear-gradient(180deg, #06b6d4 0%, #d946ef 100%);
+    border-radius: 5px;
     border: 2px solid rgba(0, 0, 0, 0.8);
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(52, 211, 153, 0.7);
+    background: linear-gradient(180deg, #22d3ee 0%, #e879f9 100%);
   }
 
-  /* LED glow effects */
-  .led-glow-green {
-    box-shadow: 0 0 10px rgba(52, 211, 153, 0.8),
-                0 0 20px rgba(52, 211, 153, 0.6),
-                0 0 30px rgba(52, 211, 153, 0.4);
+  /* Retro button press effect */
+  .button-arcade {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+    transition: all 0.1s ease;
   }
 
-  .led-glow-amber {
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.8),
-                0 0 20px rgba(251, 191, 36, 0.6),
-                0 0 30px rgba(251, 191, 36, 0.4);
+  .button-arcade:active {
+    transform: translateY(3px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.8),
+                inset 0 -1px 3px rgba(0, 0, 0, 0.5);
   }
 
-  /* Typing animation */
-  @keyframes typing {
-    from {
-      width: 0;
-    }
-    to {
-      width: 100%;
-    }
-  }
-
-  .typing-animation {
-    overflow: hidden;
-    white-space: nowrap;
-    animation: typing 3s steps(40, end);
-  }
-
-  /* CRT boot-up effect */
-  @keyframes crt-boot {
-    0% {
-      transform: scaleY(0.01) scaleX(1);
-      opacity: 0;
-    }
-    50% {
-      transform: scaleY(0.01) scaleX(1);
+  /* Blinking arcade text */
+  @keyframes arcade-blink {
+    0%, 49% {
       opacity: 1;
+    }
+    50%, 100% {
+      opacity: 0.3;
+    }
+  }
+
+  .arcade-blink {
+    animation: arcade-blink 1s step-end infinite;
+  }
+
+  /* Neon border glow */
+  .neon-border-cyan {
+    border-color: #06b6d4;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.6),
+                inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+
+  .neon-border-fuchsia {
+    border-color: #d946ef;
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.6),
+                inset 0 0 20px rgba(217, 70, 239, 0.1);
+  }
+
+  .neon-border-yellow {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6),
+                inset 0 0 20px rgba(251, 191, 36, 0.1);
+  }
+
+  /* Arcade marquee animation */
+  @keyframes marquee-scroll {
+    0% {
+      transform: translateX(100%);
     }
     100% {
-      transform: scaleY(1) scaleX(1);
-      opacity: 1;
+      transform: translateX(-100%);
     }
   }
 
-  .crt-boot-animation {
-    animation: crt-boot 0.5s ease-out;
-  }
-
-  /* Screen power-off effect */
-  @keyframes power-off {
-    0% {
-      transform: scaleY(1) scaleX(1);
-      opacity: 1;
-    }
-    60% {
-      transform: scaleY(0.01) scaleX(1);
-      opacity: 1;
-    }
-    100% {
-      transform: scaleY(0) scaleX(0);
-      opacity: 0;
-    }
-  }
-
-  .power-off-animation {
-    animation: power-off 0.3s ease-in forwards;
+  .marquee-scroll {
+    animation: marquee-scroll 20s linear infinite;
   }
 }
 
@@ -204,24 +171,24 @@
   }
 }
 
-/* Custom focus outline - CRT style */
+/* Custom focus outline - neon style */
 *:focus-visible {
-  outline: 2px solid rgba(52, 211, 153, 0.8);
+  outline: 3px solid rgba(34, 211, 238, 0.8);
   outline-offset: 3px;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.6);
 }
 
-/* Selection styling - phosphor green */
+/* Selection styling - arcade colors */
 ::selection {
-  background-color: rgba(52, 211, 153, 0.3);
-  color: #4ade80;
-  text-shadow: 0 0 5px rgba(52, 211, 153, 0.8);
+  background-color: rgba(217, 70, 239, 0.5);
+  color: #ffff00;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
 }
 
 ::-moz-selection {
-  background-color: rgba(52, 211, 153, 0.3);
-  color: #4ade80;
-  text-shadow: 0 0 5px rgba(52, 211, 153, 0.8);
+  background-color: rgba(217, 70, 239, 0.5);
+  color: #ffff00;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
 }
 
 /* Prevent layout shift */
@@ -236,22 +203,38 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Monospace font for retro computer feel */
-.font-mono {
+/* Arcade-style fonts */
+.font-arcade {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.font-pixel {
   font-family: 'Courier New', 'Courier', monospace;
   letter-spacing: 0.05em;
 }
 
-/* Flickering effect for authentic CRT feel */
-@keyframes subtle-flicker {
+/* Wood grain texture for cabinet */
+.wood-grain {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(139, 69, 19, 0.3) 0px,
+    rgba(101, 67, 33, 0.3) 10px,
+    rgba(139, 69, 19, 0.3) 20px
+  );
+}
+
+/* Screen flicker effect */
+@keyframes screen-flicker {
   0%, 100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.98;
+    opacity: 0.97;
   }
 }
 
-.subtle-flicker {
-  animation: subtle-flicker 0.1s infinite;
+.screen-flicker {
+  animation: screen-flicker 0.15s infinite;
 }
