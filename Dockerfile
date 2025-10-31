@@ -23,14 +23,12 @@ WORKDIR /app
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Copy package files
-COPY package*.json ./
+# For standalone, we only need runtime dependencies (already included in server.js)
+# No npm install needed in production stage
 
-# Install production dependencies only
-RUN npm ci --only=production
-
-# Copy built application from builder
-COPY --from=builder /app/.next ./.next
+# Copy built application from builder (standalone mode)
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
 # Set environment to production and configure Next.js to listen on port 8080
@@ -46,5 +44,5 @@ EXPOSE 8080
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/sbin/dumb-init", "--"]
 
-# Start the Next.js server
-CMD ["npm", "start"]
+# Start the Next.js standalone server directly
+CMD ["node", "server.js"]

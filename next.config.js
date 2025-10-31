@@ -6,6 +6,10 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
+  swcMinify: true,
+
+  // Use standalone mode for smaller Docker images
+  output: 'standalone',
 
   // Security headers
   headers: async () => [
