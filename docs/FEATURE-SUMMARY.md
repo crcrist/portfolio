@@ -358,3 +358,21 @@ See `DEPLOYMENT-GUIDE.md` for detailed deployment instructions!
 This portfolio will make recruiters go **"DAMN, THAT'S SICK!"**
 
 Share it, deploy it, and watch the opportunities roll in! 🚀🎮
+
+---
+
+## 🐛 Known Issues & To-Do
+
+### Chatbot Issue (Priority: High)
+⚠️ **Status**: Broken - Needs fixing
+- The chatbot component (`GlassChatbot.tsx`) is currently not functioning properly
+- **Needs**:
+  - Fix API endpoint integration
+  - Verify Google Cloud credentials setup
+  - Test RAG embedding retrieval
+  - Update to use new glass morphism theme styling
+- **Timeline**: Fix after pushing theme update to production
+- **Related files**:
+  - `components/glass/GlassChatbot.tsx`
+  - `pages/api/chat.ts`
+  - `lib/rag/retrieve.ts`
