@@ -33,8 +33,9 @@ RUN npm ci --only=production
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
-# Set environment to production
+# Set environment to production and configure Next.js to listen on port 8080
 ENV NODE_ENV=production
+ENV PORT=8080
 
 # Expose port (Cloud Run uses 8080 by default)
 EXPOSE 8080
