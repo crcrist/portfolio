@@ -1,12 +1,12 @@
-# Portfolio Redesign - Product Requirements Document (PRD)
+# Portfolio Design - Product Requirements Document (PRD)
 
 ## 🎯 Project Overview
 
-**Objective**: Transform the arcade-themed portfolio into a modern, elegant glassmorphism design with calm aesthetics and a standout 3D interactive feature.
+**Current Design**: Modern, elegant glassmorphism portfolio with lava lamp animated effects, crimson/ruby color palette, and interactive 3D features.
 
 **Target Audience**: Recruiters, hiring managers, potential clients seeking a sophisticated, professional developer
 
-**Timeline**: Single autonomous build session
+**Status**: Production deployment at https://portfolio-528730556404.us-central1.run.app
 
 ---
 
@@ -35,11 +35,17 @@
 
 ### Color Palette
 
-**Primary Colors** (Elegant Rose Coral):
-- **Background Base**: `#0f0a0e` (Deep charcoal with rose undertone)
-- **Background Gradient**: `#0f0a0e` → `#1a1014` → `#2a1420` (Rich depth with rose hints)
-- **Accent Primary**: `#e17c6b` (Warm rose coral - sophisticated, premium)
-- **Accent Secondary**: `#d4615e` (Deeper coral - elegant complement)
+**Primary Colors** (Crimson/Ruby - Dramatic Red Tones):
+- **Background Base**: `#0f0a0e` (Deep charcoal with dark undertone)
+- **Background Gradient**: `#0f0a0e` → `#1a1014` → `#2a1420` (Rich depth progression)
+- **Crimson Palette**:
+  - Light: `#c41e3a` (Vibrant crimson)
+  - Default: `#a0141e` (Deep crimson red)
+  - Dark: `#7a0c1a` (Dark blood red)
+- **Ruby Palette**:
+  - Light: `#d32f2f` (Bright ruby)
+  - Default: `#b71c1c` (Deep ruby)
+  - Dark: `#8b0000` (Dark ruby)
 
 **Glass/Surface Colors**:
 - **Glass Light**: `rgba(255, 255, 255, 0.05)` (Subtle glass)

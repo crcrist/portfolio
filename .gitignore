@@ -18,6 +18,17 @@ dist/
 .env.production
 .env.test
 
+# GCP Service Account Keys (SECURITY - Never commit!)
+*-key.json
+*credentials*.json
+service-account*.json
+github-actions-key.json
+
+# Setup scripts (temporary helpers)
+setup-github-actions.bat
+add-github-secrets.bat
+add-github-secrets.ps1
+
 # Logs
 logs
 *.log
@@ -36,3 +47,30 @@ Thumbs.db
 # Docker
 *.pid
 docker-compose.override.yml
+
+# Claude Flow generated files
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+.claude-flow/
+memory/
+coordination/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+claude-flow
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt
