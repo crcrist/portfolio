@@ -1,8 +1,14 @@
 "use client";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Star, GitFork } from "lucide-react";
 import GlassButton from "./GlassButton";
+
+interface GitHubStats {
+  stars: number;
+  forks: number;
+  language: string | null;
+}
 
 interface ProjectCardProps {
   title: string;
@@ -10,6 +16,7 @@ interface ProjectCardProps {
   tags: string[];
   demoUrl?: string;
   githubUrl?: string;
+  githubRepo?: string;
   imageUrl?: string;
   delay?: number;
 }
@@ -20,9 +27,39 @@ function ProjectCard({
   tags,
   demoUrl,
   githubUrl,
+  githubRepo,
   imageUrl,
   delay = 0
 }: ProjectCardProps) {
+  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+  // Fetch GitHub stats if githubRepo is provided
+  useEffect(() => {
+    if (!githubRepo) return;
+
+    const fetchStats = async () => {
+      setIsLoadingStats(true);
+      try {
+        const response = await fetch(`/api/github/repo?repo=${encodeURIComponent(githubRepo)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setGithubStats({
+            stars: data.stars,
+            forks: data.forks,
+            language: data.language,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch GitHub stats:", error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, [githubRepo]);
+
   return (
     <motion.div
       className="group relative bg-glass backdrop-blur-lg rounded-2xl border border-glass-border
@@ -64,7 +101,7 @@ function ProjectCard({
         </p>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4">
           {tags.map((tag) => (
             <span
               key={tag}
@@ -75,6 +112,25 @@ function ProjectCard({
             </span>
           ))}
         </div>
+
+        {/* GitHub Stats */}
+        {githubStats && (
+          <div className="flex items-center gap-4 mb-4 text-sm text-white/60">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4" />
+              <span>{githubStats.stars}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <GitFork className="w-4 h-4" />
+              <span>{githubStats.forks}</span>
+            </div>
+            {githubStats.language && (
+              <div className="px-2 py-0.5 bg-glass-light rounded-full text-xs">
+                {githubStats.language}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-3">

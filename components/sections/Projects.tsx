@@ -4,44 +4,11 @@ import ProjectCard from "../glass/ProjectCard";
 
 const projects = [
   {
-    title: "Budget Blaster",
-    description: "Full-stack financial management app with real-time expense tracking, budget goals, and insightful analytics. Built with React, Node.js, and PostgreSQL.",
-    tags: ["React", "Node.js", "PostgreSQL", "Chart.js"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    title: "Stock Invaders",
-    description: "Market data analytics platform with real-time stock monitoring, predictive algorithms, and portfolio management. Features WebSocket integration for live updates.",
-    tags: ["Next.js", "Python", "WebSocket", "TensorFlow"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    title: "Recipe Quest",
-    description: "Interactive recipe discovery app with random recipe generation, Spotify integration for cooking playlists, and meal planning features.",
-    tags: ["React", "Spotify API", "Firebase"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    title: "Homelab Hero",
-    description: "Infrastructure management dashboard for monitoring server resources, automating tasks, and maintaining 100% uptime. Built with Docker and Kubernetes.",
-    tags: ["Docker", "Kubernetes", "Grafana", "Prometheus"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    title: "Portfolio v2",
-    description: "This portfolio! Built with Next.js 15, Three.js for 3D graphics, and glassmorphism design. Features a morphing blob and smooth animations.",
-    tags: ["Next.js", "Three.js", "Framer Motion", "TypeScript"],
-    githubUrl: "#",
-  },
-  {
-    title: "RAG Chatbot",
-    description: "AI-powered chatbot using Retrieval-Augmented Generation with Google Cloud Vertex AI. Provides context-aware responses about portfolio projects.",
-    tags: ["Next.js", "Vertex AI", "RAG", "GCP"],
-    demoUrl: "#",
+    title: "CustomGPT Actions Test",
+    description: "Testing with API deployed through Google Cloud Run + Google Auth using JavaScript and hitting from CustomGPT actions.",
+    tags: ["JavaScript", "Google Cloud Run", "Google Auth", "CustomGPT"],
+    githubUrl: "https://github.com/crcrist/customgpt-actions-test",
+    githubRepo: "crcrist/customgpt-actions-test",
   },
 ];
 
