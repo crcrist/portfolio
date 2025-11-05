@@ -7,6 +7,16 @@ on:
       - 'docs/**'
       - '*.md'
       - '.github/workflows/ci.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
 
 env:
   PROJECT_ID: optical-name-470223-i3
@@ -17,6 +27,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     permissions:
       contents: read
@@ -26,7 +37,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify deployment files
+        run: |
+          echo "🔍 Verifying required deployment files..."
+          REQUIRED_FILES=("Dockerfile" "package.json" "package-lock.json" "next.config.js")
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ ERROR: Required file $file not found!"
+              exit 1
+            fi
+            echo "✅ $file found"
+          done
+
+          echo "✅ All required files present"
+
       - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
@@ -36,23 +63,64 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
+      - name: Verify GCP authentication
+        run: |
+          echo "🔐 Verifying GCP authentication..."
+          gcloud config list
+          gcloud auth list
+          echo "✅ GCP authentication successful"
+
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker
+        run: |
+          echo "🐳 Configuring Docker for GCR..."
+          gcloud auth configure-docker --quiet
+          echo "✅ Docker configured for GCR"
 
       - name: Build Docker image
         run: |
+          echo "🔨 Building Docker image..."
           docker build \
-            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -t ${{ env.IMAGE_NAME }}:latest \
+            --tag ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --tag ${{ env.IMAGE_NAME }}:latest \
+            --build-arg NODE_ENV=production \
             .
+
+          echo "✅ Docker image built successfully"
+          docker images | grep portfolio
+
+      - name: Test Docker image locally
+        run: |
+          echo "🧪 Testing Docker image..."
+          docker run -d \
+            --name portfolio-test \
+            -p 8080:8080 \
+            -e NODE_ENV=production \
+            -e PORT=8080 \
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+          echo "⏳ Waiting for container to start..."
+          sleep 10
+
+          echo "📊 Container logs:"
+          docker logs portfolio-test
+
+          echo "🛑 Stopping test container..."
+          docker stop portfolio-test
+          docker rm portfolio-test
+
+          echo "✅ Docker image test passed"
 
       - name: Push Docker image to GCR
         run: |
+          echo "⬆️  Pushing Docker image to GCR..."
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
+          echo "✅ Docker images pushed successfully"
 
       - name: Deploy to Cloud Run
+        id: deploy
         run: |
+          echo "🚀 Deploying to Cloud Run..."
           gcloud run deploy ${{ env.SERVICE_NAME }} \
             --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
@@ -60,28 +128,93 @@ jobs:
             --allow-unauthenticated \
             --memory 2Gi \
             --cpu 1 \
+            --min-instances 0 \
             --max-instances 10 \
             --timeout 300 \
-            --set-env-vars GCP_PROJECT_ID=${{ env.PROJECT_ID }},NODE_ENV=production \
-            --port 8080
+            --set-env-vars "GCP_PROJECT_ID=${{ env.PROJECT_ID }},NODE_ENV=production" \
+            --port 8080 \
+            --quiet
 
-      - name: Get Cloud Run URL
-        id: get-url
+          echo "✅ Deployment completed"
+
+      - name: Get Cloud Run service details
+        id: get-service
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region ${{ env.REGION }} \
             --format 'value(status.url)')
-          echo "Service deployed to: $SERVICE_URL"
+
+          SERVICE_STATUS=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format 'value(status.conditions[0].status)')
+
           echo "url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "status=$SERVICE_STATUS" >> $GITHUB_OUTPUT
+
+          echo "📡 Service URL: $SERVICE_URL"
+          echo "📊 Service Status: $SERVICE_STATUS"
+
+      - name: Health check
+        run: |
+          echo "🏥 Running health check..."
+          SERVICE_URL="${{ steps.get-service.outputs.url }}"
+
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES..."
+
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL" || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
+              echo "✅ Health check passed! HTTP $HTTP_CODE"
+              exit 0
+            fi
+
+            echo "⚠️  Health check failed with HTTP $HTTP_CODE, retrying in 10s..."
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            sleep 10
+          done
+
+          echo "❌ Health check failed after $MAX_RETRIES attempts"
+          exit 1
 
       - name: Deployment summary
+        if: always()
         run: |
-          echo "## 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service:** ${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** ${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** ${{ steps.get-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.get-service.outputs.status }}" = "True" ]; then
+            echo "### ✅ Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ Deployment Status Unknown" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Service** | ${{ env.SERVICE_NAME }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Region** | ${{ env.REGION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image** | ${{ env.IMAGE_NAME }}:${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **URL** | ${{ steps.get-service.outputs.url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Workflow** | ${{ github.workflow }} #${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [Service URL](${{ steps.get-service.outputs.url }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Cloud Console](https://console.cloud.google.com/run/detail/${{ env.REGION }}/${{ env.SERVICE_NAME }}?project=${{ env.PROJECT_ID }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Logs](https://console.cloud.google.com/logs/query?project=${{ env.PROJECT_ID }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment to Cloud Run failed. Please check the logs for more details." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY

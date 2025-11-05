@@ -4,7 +4,9 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'claude/**'
     paths-ignore:
       - 'docs/**'
       - '*.md'
@@ -16,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18.x, 20.x]
 
     steps:
       - name: Checkout code
@@ -28,6 +30,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Verify required files
+        run: |
+          echo "Checking for required configuration files..."
+          for file in package.json package-lock.json next.config.js tsconfig.json Dockerfile; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Required file $file not found!"
+              exit 1
+            fi
+            echo "✓ $file found"
+          done
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -35,8 +48,9 @@ jobs:
             ~/.npm
             node_modules
             .next/cache
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
             ${{ runner.os }}-node-
 
       - name: Install dependencies
@@ -49,20 +63,35 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Check build artifacts
+      - name: Verify build artifacts
         run: |
           if [ ! -d ".next" ]; then
-            echo "Build failed - .next directory not found"
+            echo "❌ Build failed - .next directory not found"
             exit 1
           fi
-          echo "Build successful - .next directory exists"
+
+          if [ ! -d ".next/static" ]; then
+            echo "❌ Build failed - .next/static directory not found"
+            exit 1
+          fi
+
+          if [ ! -f ".next/BUILD_ID" ]; then
+            echo "❌ Build failed - BUILD_ID not found"
+            exit 1
+          fi
+
+          BUILD_ID=$(cat .next/BUILD_ID)
+          echo "✅ Build successful! Build ID: $BUILD_ID"
+          echo "✅ .next directory exists with all required artifacts"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
-        if: success()
+        if: success() && matrix.node-version == '18.x'
         with:
-          name: build-artifacts
-          path: .next/
+          name: build-artifacts-node-${{ matrix.node-version }}
+          path: |
+            .next/
+            package.json
+            package-lock.json
           retention-days: 7

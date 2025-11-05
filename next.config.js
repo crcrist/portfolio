@@ -6,7 +6,7 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  swcMinify: true,
+  // swcMinify removed - enabled by default in Next.js 13+
 
   // Use standalone mode for smaller Docker images
   // output: 'standalone',  // Disabled for Cloud Run compatibility
