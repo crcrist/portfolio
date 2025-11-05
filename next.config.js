@@ -3,8 +3,6 @@ const nextConfig = {
   // Fix for multi-workspace monorepo setup
   outputFileTracingRoot: __dirname,
 
-  // Deployment validation: 2025-11-04
-
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
